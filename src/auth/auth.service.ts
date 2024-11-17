@@ -10,7 +10,7 @@ import { LoginDto } from './dto/login.dto';
 @Injectable()
 export class AuthService {
     constructor(
-        @InjectModel(User.name) private userModel: Model<User>,
+        @InjectModel('User') private userModel: Model<User>,
         private readonly jwtService: JwtService
     ){}
 
