@@ -1,4 +1,4 @@
-import {  Injectable } from '@nestjs/common';
+import {  Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Chat } from './schema/chat.schema';
@@ -7,13 +7,15 @@ import { ChatGateway } from './chat.gateway';
 
 @Injectable()
 export class ChatService {
-    constructor(@InjectModel('Chat') private readonly chatModel: Model<Chat>,private  gateway: ChatGateway){}
+    constructor(@InjectModel('Chat') private readonly chatModel: Model<Chat>,private  gateway: ChatGateway,@Inject('CHAT_SERVICE') private readonly client: ClientProxy){}
 
     async sendMessage(sender: string, receiver: string, content: string) :Promise<Chat> {
         const message = new this.chatModel({ sender, receiver, content });
         const savedMessage = await message.save();
 
-        this.gateway.server.emit('message', savedMessage);
+        this.client.emit('message_queue', savedMessage);
+
+        this.gateway.broadCastMessage(savedMessage);
 
         return savedMessage;
     }
