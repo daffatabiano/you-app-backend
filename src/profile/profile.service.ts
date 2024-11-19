@@ -26,12 +26,12 @@ export class ProfileService{
 
         if(!user) throw new UnauthorizedException('User not found');
 
-        const existingProfile = await this.profileModel.findOne({userId}).exec();
+        const existingProfile = await this.profileModel.findOne({userId})
         console.log(existingProfile);
 
         if(existingProfile) throw new ConflictException('Profile already exists')
 
-        const createdProfile = new this.profileModel({...createProfileDto, userId} );
+        const createdProfile = await this.profileModel.create({...createProfileDto, userId} );
         try {
             return await createdProfile.save();
         }catch (err){
@@ -43,7 +43,7 @@ export class ProfileService{
         const decodedToken = await this.jwtService.decode(token) as {id: string};
 
         const userId = decodedToken.id;
-        const profile = await this.profileModel.findOne({userId}).exec();
+        const profile = await this.profileModel.findOne({userId});
         if(!profile) throw new UnauthorizedException('Profile not found');
 
         const horoscope = this.calculateHoroscope(profile.birthday);
@@ -80,10 +80,10 @@ export class ProfileService{
     }
 
     async update(id: string, updateProfileDto: UpdateProfileDto): Promise<Profile>{
-        return await this.profileModel.findByIdAndUpdate(id, updateProfileDto, {new: true}).exec();
+        return await this.profileModel.findByIdAndUpdate(id, updateProfileDto, {new: true})
     }
 
     async delete(id: string): Promise<any>{
-        return await this.profileModel.findByIdAndDelete(id).exec();
+        return await this.profileModel.findByIdAndDelete(id)
     }
 }
