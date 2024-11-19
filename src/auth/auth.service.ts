@@ -38,7 +38,7 @@ export class AuthService {
 
     async login (loginDto : LoginDto): Promise<{token: string, message: string, user: User}>{
         const {email, password} = loginDto;
-        const user = await this.userModel.findOne({email});
+        const user = await this.userModel.findOne({email})
         if(!user) throw new UnauthorizedException('User not found');
 
         const isPasswordMatch = await bcrypt.compare(password, user.password);
@@ -47,10 +47,7 @@ export class AuthService {
 
         const token = this.jwtService.sign({id: user._id});
 
-        return {message: 'Login successful', user: {
-            ...user.toObject(),
-            password: undefined
-        }, token};
+        return {message: 'Login successful', user: user, token};
     }
     
 }
